@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\RecommendationController;
 use App\Http\Controllers\Api\PasswordResetController;
 
+
 Route::post('/register',[AuthController::class, 'register']);
 Route::post('/login',[AuthController::class, 'login']);
 
@@ -34,6 +35,7 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('/courses/recommended',[RecommendationController::class, 'index']);
 
+        //wishlist 
         Route::get('/favorites',[FavoretlistController::class, 'index']);
         Route::post('/favorites/{courseId}',[FavoretlistController::class, 'store']);
         Route::delete('/favorites/{courseId}',[FavoretlistController::class, 'destroy']);
@@ -46,6 +48,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::middleware('role:teacher')->group(function () {
 
+        //courses
         Route::post('/courses',[CourseController::class, 'store']);
         Route::put('/courses/{id}',[CourseController::class, 'update']);
         Route::delete('/courses/{id}',[CourseController::class, 'destroy']);
