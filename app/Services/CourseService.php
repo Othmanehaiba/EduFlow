@@ -1,5 +1,8 @@
 <?php
 
+// Service pour les cours — version mise à jour
+// Remplace l'ancienne version — ajoute teacherCourses()
+
 namespace App\Services;
 
 use App\Interfaces\CourseRepositoryInterface;
@@ -39,5 +42,13 @@ class CourseService
     public function recommendedCourses(array $interestIds)
     {
         return $this->courseRepository->getRecommendedForStudent($interestIds);
+    }
+
+    // -------------------------------------------------------
+    // Récupérer les cours d'un enseignant avec le nombre d'inscrits
+    // -------------------------------------------------------
+    public function teacherCourses(int $teacherId)
+    {
+        return $this->courseRepository->getByTeacher($teacherId);
     }
 }

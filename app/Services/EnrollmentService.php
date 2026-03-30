@@ -1,66 +1,76 @@
 <?php
 
+// Service pour gérer les inscriptions et désinscriptions aux cours
+// Ce fichier REMPLACE l'ancien EnrollmentService.php
+
 namespace App\Services;
 
-use App\Models\Course;
-use App\Models\Enrollment;
-use App\Models\Group;
-use App\Models\Payment;
+use App\Interfaces\EnrollmentRepositoryInterface;
+use App\Models\Course; // Pour les statistiques
 
 class EnrollmentService
 {
+    // On injecte le repository dans le constructeur
+    public function __construct(
+        protected EnrollmentRepositoryInterface $enrollmentRepository
+    ) {}
+
+    // -------------------------------------------------------
+    // Inscrire un étudiant à un cours (après paiement)
+    // -------------------------------------------------------
     public function enroll(int $studentId, int $courseId, int $paymentId)
     {
-        $alreadyEnrolled = Enrollment::where('student_id', $studentId)
-            ->where('course_id', $courseId)
-            ->exists();
-
-        if ($alreadyEnrolled) {
-            throw new \Exception('Tu es déjà inscrit à ce cours.');
-        }
-
-        $payment = Payment::findOrFail($paymentId);
-
-        if ($payment->status !== 'paid') {
-            throw new \Exception('Le paiement doit être validé avant l’inscription.');
-        }
-
-        $group = Group::where('course_id', $courseId)
-            ->withCount('enrollments')
-            ->get()
-            ->first(function ($group) {
-                return $group->enrollments_count < $group->max_students;
-            });
-
-        if (! $group) {
-            $groupsCount = Group::where('course_id', $courseId)->count();
-
-            $group = Group::create([
-                'course_id' => $courseId,
-                'name' => 'Group ' . ($groupsCount + 1),
-                'max_students' => 25,
-            ]);
-        }
-
-        return Enrollment::create([
-            'student_id' => $studentId,
-            'course_id' => $courseId,
-            'group_id' => $group->id,
-            'payment_id' => $paymentId,
-            'status' => 'enrolled',
-        ]);
+        // On délègue au repository qui fait le vrai travail
+        return $this->enrollmentRepository->enroll($studentId, $courseId, $paymentId);
     }
 
+    // -------------------------------------------------------
+    // Désinscrire un étudiant d'un cours
+    // -------------------------------------------------------
     public function unenroll(int $studentId, int $courseId)
     {
-        $enrollment = Enrollment::where('student_id', $studentId)
-            ->where('course_id', $courseId)
-            ->firstOrFail();
+        return $this->enrollmentRepository->unenroll($studentId, $courseId);
+    }
 
-        $enrollment->update([
-            'status' => 'cancelled'
-        ]);
+    // -------------------------------------------------------
+    // Un enseignant voit ses inscrits + statistiques
+    // -------------------------------------------------------
+    public function getStudentsByCourse(int $courseId)
+    {
+        return $this->enrollmentRepository->getStudentsByCourse($courseId);
+    }
 
-        return $enrollment;
+    // -------------------------------------------------------
+    // Statistiques pour un enseignant sur ses cours
+    // -------------------------------------------------------
+    // $teacherId : l'ID de l'enseignant connecté
+    public function getTeacherStats(int $teacherId)
+    {
+        // Charger tous les cours de cet enseignant
+        // withCount ajoute "enrollments_count" automatiquement
+        $courses = Course::where('teacher_id', $teacherId)
+                         ->withCount('enrollments') // nombre d'inscrits par cours
+                         ->get();
+
+        // Calculer les statistiques globales
+        $totalCourses     = $courses->count();            // nombre de cours
+        $totalStudents    = $courses->sum('enrollments_count'); // total inscrits
+        $totalRevenue     = 0; // On calculera le revenu ci-dessous
+
+        // Calculer le revenu total en sommant les paiements "paid" de chaque cours
+        foreach ($courses as $course) {
+            // sum() additionne la colonne 'amount' de tous les paiements payés
+            $totalRevenue += $course->payments()
+                                    ->where('status', 'paid')
+                                    ->sum('amount');
+        }
+
+        // Retourner un tableau avec toutes les stats
+        return [
+            'total_courses'  => $totalCourses,
+            'total_students' => $totalStudents,
+            'total_revenue'  => $totalRevenue,
+            'courses'        => $courses, // la liste détaillée des cours
+        ];
     }
 }
