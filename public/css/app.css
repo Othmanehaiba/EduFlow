@@ -1,0 +1,168 @@
+/* public/css/app.css
+   Custom styles that add on top of Bootstrap.
+   Bootstrap handles the heavy lifting — we only add our own touches here. */
+
+
+/* ============================================================
+   COURSE CARDS
+   The hover animation that lifts the card when you mouse over it
+   ============================================================ */
+.course-card {
+    /* transition makes changes smooth instead of instant */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer; /* shows a hand cursor on hover */
+}
+
+.course-card:hover {
+    /* moves the card 4px up */
+    transform: translateY(-4px);
+    /* adds a soft shadow underneath */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+
+/* ============================================================
+   PRICE DISPLAY
+   The green price shown on course cards
+   ============================================================ */
+.price-badge {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #198754; /* Bootstrap green */
+}
+
+
+/* ============================================================
+   LOADING SPINNER CENTER
+   Used while waiting for API data to arrive
+   ============================================================ */
+.loading-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+
+/* ============================================================
+   TOAST NOTIFICATION COLORS
+   Bootstrap has bg-success etc but we override for better shades
+   ============================================================ */
+.toast.bg-success { background-color: #157347 !important; }
+.toast.bg-danger  { background-color: #b02a37 !important; }
+.toast.bg-info    { background-color: #0a58ca !important; }
+.toast.bg-warning { background-color: #cc8400 !important; }
+
+
+/* ============================================================
+   PAGE FADE IN
+   Every page fades in smoothly when it loads
+   ============================================================ */
+main {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px); /* starts slightly below */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================================
+   INTEREST BADGES (register page)
+   The clickable topic badges on the register page
+   ============================================================ */
+.interest-badge {
+    cursor: pointer;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    user-select: none; /* prevents text selection when clicking fast */
+}
+
+.interest-badge:hover {
+    background-color: #e2e6ea;
+}
+
+.interest-badge.selected {
+    background-color: #212529 !important; /* dark */
+    color: white !important;
+    border-color: #212529 !important;
+}
+
+
+/* ============================================================
+   DASHBOARD STAT CARDS
+   The number summary cards on teacher/student dashboards
+   ============================================================ */
+.stat-card {
+    border-radius: 12px;
+    padding: 20px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.stat-card .stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   Shown when a list has no items (no courses, no favorites, etc.)
+   ============================================================ */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #adb5bd;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+}
+
+
+/* ============================================================
+   BUTTONS
+   Small tweaks to Bootstrap buttons
+   ============================================================ */
+.btn {
+    border-radius: 8px;
+}
+
+.btn-dark {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.btn-dark:hover {
+    background-color: #343a40;
+    border-color: #343a40;
+}
+
+
+/* ============================================================
+   NAVBAR
+   Small tweaks
+   ============================================================ */
+.navbar-brand {
+    font-size: 1.3rem;
+}
